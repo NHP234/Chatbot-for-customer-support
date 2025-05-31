@@ -1,0 +1,11 @@
+pandas
+numpy
+scikit-learn
+datasets==2.18.0
+fsspec==2023.10.0
+transformers
+# Dòng torch sẽ được xử lý riêng bên dưới
+bitsandbytes
+accelerate
+torch
+Flask
