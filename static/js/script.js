@@ -37,7 +37,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function appendMessage(sender, text) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', `${sender}-message`);
-        messageElement.textContent = text;
+
+        if (sender === 'bot') {
+            messageElement.innerHTML = marked.parse(text);
+        } else {
+            messageElement.textContent = text;
+        }
+
         chatBox.appendChild(messageElement);
         chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
     }

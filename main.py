@@ -366,6 +366,13 @@ intent_prompts = {
     'default': "You are a helpful customer support assistant. Respond professionally to the inquiry."
 }
 
+# Add an instruction to all prompts to prevent the model from showing its thought process.
+# This is the primary fix for inconsistent output containing <think> tags.
+instruction_suffix = " Your response must be direct and helpful, without any of your own thought processes, meta-commentary, or self-correction like '<think>...</think>'."
+for intent in intent_prompts:
+    intent_prompts[intent] += instruction_suffix
+
+
 pipe = None
 try:
     quantization_config = BitsAndBytesConfig(
@@ -458,22 +465,27 @@ def generate_response(query):
                     if isinstance(final_message_in_sequence, dict) and final_message_in_sequence.get('role') == 'assistant':
                         assistant_response_text = final_message_in_sequence.get('content')
                         if assistant_response_text:
-                            # Loại bỏ phần <think>...</think>
-                            cleaned_response_text = re.sub(r'<think>.*?</think>', '', assistant_response_text, flags=re.DOTALL).strip()
-                            
-                            # Thay thế \n bằng <br> để xuống dòng trên HTML
-                            html_formatted_response = cleaned_response_text.replace('\\n', '<br>')
-                            
-                            # (Tùy chọn) Loại bỏ các thành phần không mong muốn khác, ví dụ: "**Final Answer** ... \boxed{...}"
-                            # Cần cẩn thận với regex này để không xóa nhầm nội dung hữu ích
-                            # html_formatted_response = re.sub(r'\*\*Final Answer\*\*.*?\\boxed{.*?}.*$', '', html_formatted_response, flags=re.DOTALL).strip()
+                            # The model consistently places the final, clean response after the last </think> tag.
+                            # We will split the string at the last occurrence of '</think>' and take the part that follows.
+                            parts = assistant_response_text.rsplit('</think>', 1)
 
-                            # (Tùy chọn) Loại bỏ một số emoji/ký tự đặc biệt nếu chúng gây vấn đề
-                            # Ví dụ đơn giản: html_formatted_response = html_formatted_response.replace('💬', '').replace('∧♾', '') 
+                            # If the split was successful, the response is the second part. Otherwise, use the whole text.
+                            if len(parts) > 1:
+                                cleaned_response_text = parts[1]
+                            else:
+                                # Fallback in case the model behaves and doesn't produce <think> tags.
+                                cleaned_response_text = assistant_response_text
 
-                            print(f"DEBUG main.py - HTML formatted assistant content: {html_formatted_response}")
-                            print(f"DEBUG main.py - Type of HTML formatted assistant content: {type(html_formatted_response)}")
-                            return str(html_formatted_response)
+                            # Remove any leading characters like '---', whitespace, or other special tokens.
+                            cleaned_response_text = re.sub(r'^[\s\W]*---', '', cleaned_response_text.strip())
+                            
+                            # Remove any remaining unwanted artifacts and trailing whitespace.
+                            cleaned_response_text = re.sub(r'<\|.*?\|>', '', cleaned_response_text) # Remove special tokens like <|...|>
+                            cleaned_response_text = re.sub(r'\\boxed{\\text{.*?}}', '', cleaned_response_text).strip()
+                            
+                            print(f"DEBUG main.py - Cleaned Markdown response: {cleaned_response_text}")
+                            print(f"DEBUG main.py - Type of Cleaned Markdown response: {type(cleaned_response_text)}")
+                            return str(cleaned_response_text)
                         else:
                             print("DEBUG main.py - Assistant content is empty or None.")
                             return "Error: Assistant content not found or empty."
