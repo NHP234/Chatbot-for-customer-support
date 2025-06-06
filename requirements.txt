@@ -1,11 +1,11 @@
+Flask
 pandas
 numpy
 scikit-learn
 datasets==2.18.0
 fsspec==2023.10.0
-transformers
-# Dòng torch sẽ được xử lý riêng bên dưới
-bitsandbytes
-accelerate
-torch
-Flask
+transformers==4.40.1
+accelerate==0.29.3
+bitsandbytes==0.43.1
+unsloth[cu121-ampere-torch220]
+# Torch is installed as part of the unsloth package above.

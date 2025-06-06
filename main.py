@@ -507,18 +507,18 @@ def generate_response(query):
 
 
 if __name__ == "__main__":
-    print("\n--- Example Responses ---")
+print("\n--- Example Responses ---")
     # Ensure all necessary components are ready before running examples
     if pipe is not None and \
        hasattr(tfidf_vectorizer, 'vocabulary_') and tfidf_vectorizer.vocabulary_ and \
        hasattr(svm, 'classes_') and svm.classes_ is not None and len(svm.classes_) > 0 and \
        le is not None:
-        print("Query: I need to cancel my order immediately!")
-        print("Response:", generate_response("I need to cancel my order immediately!"))
+    print("Query: I need to cancel my order immediately!")
+    print("Response:", generate_response("I need to cancel my order immediately!"))
 
-        print("\nQuery: How do I track my refund status?")
-        print("Response:", generate_response("How do I track my refund status?"))
-    else:
+    print("\nQuery: How do I track my refund status?")
+    print("Response:", generate_response("How do I track my refund status?"))
+else:
         print("Skipping example responses: LLM pipeline not ready, vectorizer not initialized, SVM not trained, or LabelEncoder not ready.")
 
-    print("\nScript finished.")
+print("\nScript finished.")

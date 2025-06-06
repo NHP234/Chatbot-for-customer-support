@@ -30,4 +30,4 @@ if __name__ == '__main__':
     # Chạy app ở chế độ debug sẽ tự động tải lại khi có thay đổi code,
     # nhưng cũng có thể gây ra việc tải/huấn luyện mô hình nhiều lần nếu cấu trúc của main.py không tối ưu cho việc này.
     # Để sản xuất, bạn nên tắt debug=True và có cơ chế tải mô hình hiệu quả hơn.
-    app.run(debug=True) 
+    app.run(host='0.0.0.0', port=5000, debug=True) 
