@@ -4,8 +4,8 @@ numpy
 scikit-learn
 datasets==2.18.0
 fsspec==2023.10.0
-transformers==4.40.1
-accelerate==0.29.3
+transformers
+accelerate
 bitsandbytes==0.43.1
 unsloth[cu121-ampere-torch220]
 # Torch is installed as part of the unsloth package above.
