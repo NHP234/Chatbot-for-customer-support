@@ -25,14 +25,12 @@
     COPY requirements.txt .
     
     # 6. Install Python dependencies
-    # We upgrade pip, then install a specific version of torch compatible with unsloth.
-    # Then we install unsloth from their GitHub repo with specific extras for CUDA 12.1 and PyTorch 2.3.
-    # This is often more reliable for getting pre-compiled wheels for heavy dependencies like flash-attn.
-    # Finally, we install the rest of the packages from requirements.txt (with unsloth commented out).
+    # We upgrade pip, install a specific version of torch, then install packages from requirements.txt.
+    # Finally, we install unsloth from its GitHub repo. This order helps resolve dependencies correctly.
     RUN pip install --no-cache-dir --upgrade pip
     RUN pip install --no-cache-dir torch==2.3.0+cu121 --index-url https://download.pytorch.org/whl/cu121
-    RUN pip install --no-cache-dir "unsloth[cu121-ampere] @ git+https://github.com/unslothai/unsloth.git"
     RUN pip install --no-cache-dir -r requirements.txt
+    RUN pip install --no-cache-dir "unsloth[cu121-ampere] @ git+https://github.com/unslothai/unsloth.git"
     
     # 7. Copy application code
     COPY . .

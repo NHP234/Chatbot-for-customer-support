@@ -6,7 +6,7 @@ datasets==2.18.0
 fsspec==2023.10.0
 transformers
 accelerate
-bitsandbytes==0.43.1
+bitsandbytes==0.46.0
 # unsloth[cu121-ampere-torch220] # This is now installed directly in the Dockerfile for better reliability.
 # Torch is installed as part of the unsloth package above.
 
