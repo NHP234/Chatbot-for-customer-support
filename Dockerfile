@@ -9,9 +9,11 @@
     
     # 3. Install Python and other essentials
     # The NVIDIA image is based on Ubuntu, so we use 'apt-get'.
+    # We also install 'git' because some pip packages (like flash-attn) need it for their installation.
     RUN apt-get update && apt-get install -y \
         python3.10 \
         python3-pip \
+        git \
         && rm -rf /var/lib/apt/lists/*
     
     # 4. Set up working directory
