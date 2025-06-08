@@ -7,7 +7,7 @@ fsspec==2023.10.0
 transformers
 accelerate
 bitsandbytes==0.43.1
-unsloth[cu121-ampere-torch220]
+# unsloth[cu121-ampere-torch220] # This is now installed directly in the Dockerfile for better reliability.
 # Torch is installed as part of the unsloth package above.
 
 # Production WSGI server for Flask

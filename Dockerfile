@@ -9,32 +9,35 @@
     
     # 3. Install Python and other essentials
     # The NVIDIA image is based on Ubuntu, so we use 'apt-get'.
-    # We also install 'git' because some pip packages (like flash-attn) need it for their installation.
+    # We also install 'git' because some pip packages need it.
+    # We add 'ninja-build' which can speed up C++/CUDA extensions compilation for packages like flash-attn.
     RUN apt-get update && apt-get install -y \
         python3.10 \
         python3-pip \
         git \
+        ninja-build \
         && rm -rf /var/lib/apt/lists/*
     
     # 4. Set up working directory
     WORKDIR /app
     
-    # 5. Install Python dependencies
+    # 5. Copy requirements file
     COPY requirements.txt .
-
-    # First, install critical build dependencies that other packages (like flash-attn) need.
-    # We install torch and packaging explicitly before the rest.
-    RUN pip install --no-cache-dir --upgrade pip setuptools wheel
-    RUN pip install --no-cache-dir packaging
-    RUN pip install --no-cache-dir torch
-
-    # Now, install the remaining requirements.
+    
+    # 6. Install Python dependencies
+    # We upgrade pip, then install a specific version of torch compatible with unsloth.
+    # Then we install unsloth from their GitHub repo with specific extras for CUDA 12.1 and PyTorch 2.3.
+    # This is often more reliable for getting pre-compiled wheels for heavy dependencies like flash-attn.
+    # Finally, we install the rest of the packages from requirements.txt (with unsloth commented out).
+    RUN pip install --no-cache-dir --upgrade pip
+    RUN pip install --no-cache-dir torch==2.3.0+cu121 --index-url https://download.pytorch.org/whl/cu121
+    RUN pip install --no-cache-dir "unsloth[cu121-ampere] @ git+https://github.com/unslothai/unsloth.git"
     RUN pip install --no-cache-dir -r requirements.txt
     
-    # 6. Copy application code
+    # 7. Copy application code
     COPY . .
     
-    # 7. Set up the run command
+    # 8. Set up the run command
     # Gunicorn will listen on the port specified by the PORT variable,
     # which can be set when running the container (defaults to 8080).
     # Increased timeout for potentially long model loading times.
