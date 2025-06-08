@@ -9,3 +9,6 @@ accelerate==0.29.3
 bitsandbytes==0.43.1
 unsloth[cu121-ampere-torch220]
 # Torch is installed as part of the unsloth package above.
+
+# Production WSGI server for Flask
+gunicorn
