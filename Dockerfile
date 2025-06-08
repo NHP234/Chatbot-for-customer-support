@@ -25,13 +25,14 @@
     COPY requirements.txt .
     
     # 6. Install Python dependencies
-    # We upgrade pip, install a specific version of torch, then install packages from requirements.txt.
-    # Finally, we install unsloth from its GitHub repo. This order helps resolve dependencies correctly.
-    # We explicitly add the torch version to the unsloth extras to ensure correct dependencies are pulled.
+    # We upgrade pip, install a specific version of torch.
+    # Then we install packages from requirements.txt and unsloth in a single command.
+    # This helps pip resolve all dependencies together and respect the version constraints.
     RUN pip install --no-cache-dir --upgrade pip
     RUN pip install --no-cache-dir torch==2.3.0+cu121 --index-url https://download.pytorch.org/whl/cu121
-    RUN pip install --no-cache-dir -r requirements.txt
-    RUN pip install --no-cache-dir "unsloth[cu121-ampere-torch230] @ git+https://github.com/unslothai/unsloth.git"
+    RUN pip install --no-cache-dir \
+        -r requirements.txt \
+        "unsloth[cu121-ampere-torch230] @ git+https://github.com/unslothai/unsloth.git"
     
     # 7. Copy application code
     COPY . .
