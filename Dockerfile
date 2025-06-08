@@ -19,9 +19,14 @@
     
     # 5. Install Python dependencies
     COPY requirements.txt .
-    # First, install build dependencies and upgrade pip to solve potential issues with complex packages.
-    # 'packaging' is pre-installed because 'flash-attn' (a dependency of unsloth) needs it during its own setup.
-    RUN pip install --no-cache-dir --upgrade pip setuptools wheel packaging
+
+    # First, install critical build dependencies that other packages (like flash-attn) need.
+    # We install torch and packaging explicitly before the rest.
+    RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+    RUN pip install --no-cache-dir packaging
+    RUN pip install --no-cache-dir torch
+
+    # Now, install the remaining requirements.
     RUN pip install --no-cache-dir -r requirements.txt
     
     # 6. Copy application code
