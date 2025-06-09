@@ -9,6 +9,7 @@ accelerate
 bitsandbytes==0.46.0
 packaging>=23.0
 pyparsing>=3.0.0
+joblib # For saving and loading scikit-learn models
 # unsloth[cu121-ampere-torch220] # This is now installed directly in the Dockerfile for better reliability.
 # Torch is installed as part of the unsloth package above.
 

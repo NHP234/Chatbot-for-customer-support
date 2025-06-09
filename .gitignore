@@ -97,3 +97,6 @@ ENV3/
 
 # Trained models (if you decide to save them locally and not track them)
 # trained_models/
+
+# Models
+saved_models/
