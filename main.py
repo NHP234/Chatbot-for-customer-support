@@ -46,21 +46,34 @@ else:
 
 def initialize_llm_pipeline():
     """
-    Initializes and returns the Hugging Face text generation pipeline.
+    Initializes and returns the Hugging Face text generation pipeline,
+    dynamically selecting the model based on GPU availability.
     """
     print("Initializing LLM pipeline...")
     try:
-        quantization_config = BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_compute_dtype=torch.float16,
-        )
-        model_name = "unsloth/Phi-4-mini-reasoning-unsloth-bnb-4bit"
-        llm_model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            quantization_config=quantization_config,
-            device_map="auto"
-        )
+        # Check for GPU availability
+        if torch.cuda.is_available():
+            print("CUDA is available. Initializing with GPU support (4-bit quantization)...")
+            quantization_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.float16,
+            )
+            model_name = "unsloth/Phi-4-mini-reasoning-unsloth-bnb-4bit"
+            model_kwargs = {
+                "quantization_config": quantization_config,
+                "device_map": "auto"
+            }
+        else:
+            print("CUDA not found. Initializing with CPU support...")
+            model_name = "unsloth/Phi-3-mini-4k-instruct" # Standard model for CPU
+            model_kwargs = {
+                "torch_dtype": "auto",
+                "device_map": "auto"
+            }
+
+        llm_model = AutoModelForCausalLM.from_pretrained(model_name, **model_kwargs)
         tokenizer = AutoTokenizer.from_pretrained(model_name)
+        
         llm_pipe = pipeline(
             "text-generation",
             model=llm_model,
